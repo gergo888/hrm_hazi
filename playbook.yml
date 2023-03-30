@@ -2,9 +2,13 @@
 - name: Install and start Apache HTTPD
   hosts: servera
   tasks:
-    - name: A normal task
-      ansible.builtin.debug:
-        msg: 'first task'
     - name: SMB install and config
       ansible.builtin.import_role:
         name: ma_sch.samba
+# telepítés role-al
+# system user létrehozás
+# könyvtár létrehozás
+# samba user létrehozás
+# samba share létrhozás
+# selinux szabályok alkalmazása
+# handler: felcsatolás fstabbal
