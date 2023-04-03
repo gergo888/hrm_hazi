@@ -1,23 +1,25 @@
 ---
+#- name: Fact dump
+#  hosts: servera
+#  tasks:
+#    - name: Print all facts
+#      ansible.builtin.debug:
+#        var: ansible_facts
 - name: Install and configures SAMBA shares
   hosts: servera
   tasks:
-    - name: Add system user 
+    - name: Add system users 
       ansible.builtin.user:
-        name: james
+        name: alice
         shell: /bin/bash
-        groups: admins,developers
         append: yes
     - name: SMB install and config
       ansible.builtin.import_role:
         name: vladgh.samba.server
-      samba_users:
-    - name: alice
-      password: ecila
-    - name: bob
-      password: bob
-    - name: charlie
-      password: eilrahc
+      vars:
+        samba_users:
+        - name: alice
+          password: ecila
         
 # telepítés role-al
 # system user létrehozás
