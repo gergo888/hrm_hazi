@@ -11,6 +11,7 @@
     - name: Add system users 
       ansible.builtin.user:
         name: alice
+        groups: root
         shell: /bin/bash
         append: yes
     - name: SMB install and config
@@ -20,6 +21,9 @@
         samba_users:
         - name: alice
           password: ecila
+        samba_shares:
+        - name: pirate
+          group: root 
         
 # telepítés role-al
 # system user létrehozás
