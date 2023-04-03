@@ -1,14 +1,28 @@
 ---
-- name: Install and start Apache HTTPD
+- name: Install and configures SAMBA shares
   hosts: servera
   tasks:
+    - name: Add system user 
+      ansible.builtin.user:
+        name: james
+        shell: /bin/bash
+        groups: admins,developers
+        append: yes
     - name: SMB install and config
       ansible.builtin.import_role:
-        name: ma_sch.samba
+        name: vladgh.samba.server
+      samba_users:
+    - name: alice
+      password: ecila
+    - name: bob
+      password: bob
+    - name: charlie
+      password: eilrahc
+        
 # telepítés role-al
 # system user létrehozás
 # könyvtár létrehozás
 # samba user létrehozás
-# samba share létrhozás
+# samba share létrehozás
 # selinux szabályok alkalmazása
 # handler: felcsatolás fstabbal
