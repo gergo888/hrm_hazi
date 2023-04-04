@@ -8,10 +8,14 @@
 - name: Install and configures SAMBA shares
   hosts: servera
   tasks:
-    - name: Add system users 
+    - name: Ensure group "pirate" exists
+      ansible.builtin.group:
+        name: pirate
+        state: present
+    - name: Add system user 
       ansible.builtin.user:
         name: alice
-        groups: root
+        groups: pirate
         shell: /bin/bash
         append: yes
     - name: SMB install and config
@@ -23,12 +27,16 @@
           password: ecila
         samba_shares:
         - name: pirate
-          group: root 
-        
-# telepítés role-al
-# system user létrehozás
-# könyvtár létrehozás
-# samba user létrehozás
-# samba share létrehozás
-# selinux szabályok alkalmazása
+          group: pirate 
+          write_list: +pirate
+    - name: permit traffic in default zone for smb service
+      ansible.posix.firewalld:
+        service: samba
+        permanent: true
+        state: enabled
+
+# OK tüzfalon smb engedélyezése
+# OK írás próba        
 # handler: felcsatolás fstabbal
+
+# csak elsődleges főnök group-al mi történik?
