@@ -28,6 +28,7 @@
         service: samba
         permanent: true
         state: enabled
+        immediate: yes
 
 - name: mount SAMBA share
   hosts: serverb
