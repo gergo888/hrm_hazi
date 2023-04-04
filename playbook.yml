@@ -1,6 +1,6 @@
 ---
 - name: Install and configures SAMBA shares
-  hosts: serverd
+  hosts: serverc
   tasks:
     - name: Ensure group "pirate" exists
       ansible.builtin.group:
@@ -33,7 +33,7 @@
         state: enabled
 
 - name: mount SAMBA share
-  hosts: serverc
+  hosts: serverd
   tasks:
     - name: Install cifs-utils
       ansible.builtin.dnf:
@@ -41,8 +41,8 @@
         state: present
     - name: Make fstab entry and mount
       ansible.posix.mount:
-        src: //serverd/pirate
-        path: /mnt/
+        src: //serverc/pirate
+        path: /mnt
         opts: user=alice,password=ecila
         state: mounted
         fstype: cifs
