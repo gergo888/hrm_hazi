@@ -1,12 +1,6 @@
 ---
-#- name: Fact dump
-#  hosts: servera
-#  tasks:
-#    - name: Print all facts
-#      ansible.builtin.debug:
-#        var: ansible_facts
 - name: Install and configures SAMBA shares
-  hosts: servera
+  hosts: serverd
   tasks:
     - name: Ensure group "pirate" exists
       ansible.builtin.group:
@@ -29,14 +23,27 @@
         - name: pirate
           group: pirate 
           write_list: +pirate
-    - name: permit traffic in default zone for smb service
+      notify:
+        - set firewalld
+  handlers:
+    - name: set firewalld
       ansible.posix.firewalld:
         service: samba
         permanent: true
         state: enabled
 
-# OK tüzfalon smb engedélyezése
-# OK írás próba        
-# handler: felcsatolás fstabbal
+- name: mount SAMBA share
+  hosts: serverc
+  tasks:
+    - name: Install cifs-utils
+      ansible.builtin.dnf:
+        name: cifs-utils
+        state: present
+    - name: Make fstab entry and mount
+      ansible.posix.mount:
+        src: //serverd/pirate
+        path: /mnt/
+        opts: user=alice,password=ecila
+        state: mounted
+        fstype: cifs
 
-# csak elsődleges főnök group-al mi történik?
