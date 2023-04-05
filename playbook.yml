@@ -1,15 +1,12 @@
 ---
-- name: Install and configures SAMBA shares
-  hosts: servera
+- name: Install and configure SAMBA shares on the server
+  hosts: "{{ server }}"
+  vars_files:
+    - vars/config.yml
   tasks:
-    - name: Ensure group "pirate" exists
-      ansible.builtin.group:
-        name: pirate
-        state: present
     - name: Add system user 
       ansible.builtin.user:
-        name: alice
-        groups: pirate
+        name: "{{ user }}"
         shell: /bin/bash
         append: yes
     - name: SMB install and config
@@ -17,12 +14,13 @@
         name: vladgh.samba.server
       vars:
         samba_users:
-        - name: alice
-          password: ecila
+        - name: "{{ user }}"
+          password: "{{ smb_password }}"
         samba_shares:
-        - name: pirate
-          group: pirate 
-          write_list: +pirate
+        - name: "{{ share_name }}"
+          group: "{{ user }}" 
+          write_list: "{{ user }}"
+        samba_shares_root: /data
     - name: Set firewalld
       ansible.posix.firewalld:
         service: samba
@@ -30,18 +28,25 @@
         state: enabled
         immediate: yes
 
-- name: mount SAMBA share
-  hosts: serverb
+- name: mount SAMBA share on the client
+  hosts: "{{ client }}"
+  vars_files:
+    - vars/config.yml
   tasks:
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: "{{ mount_path }}"
+        state: directory
+        mode: '0777'
     - name: Install cifs-utils
       ansible.builtin.dnf:
         name: cifs-utils
         state: present
     - name: Make fstab entry and mount
       ansible.posix.mount:
-        src: //servera/pirate
-        path: /mnt
-        opts: user=alice,password=ecila
+        src: "{{ '//' + server + '/' + share_name }}"
+        path: "{{ mount_path }}"
+        opts: "{{ 'user=' + user + ',password=' + smb_password }}"  
         state: mounted
         fstype: cifs
 
