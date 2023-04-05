@@ -1,5 +1,5 @@
-server: serverc
-client: serverd
+server: servera
+client: serverb
 user: fonok
 smb_password: fonok
 share_path: /data

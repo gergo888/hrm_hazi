@@ -21,11 +21,25 @@
           group: "{{ user }}" 
           write_list: "{{ user }}"
         samba_shares_root: /data
-    - name: Set firewalld
+    - name: fw zone
       ansible.posix.firewalld:
-        service: samba
+        zone: custom
         permanent: true
+        state: present
+    - name: Add services to new zone
+      firewalld:
+        service: "{{ item }}"
         state: enabled
+        permanent: true
+        immediate: yes
+      loop:
+        - samba
+        - ssh
+    - name: Add port to new zone
+      firewalld:
+        port: 4312/tcp
+        state: enabled
+        permanent: true
         immediate: yes
 
 - name: mount SAMBA share on the client
@@ -42,7 +56,9 @@
       ansible.builtin.dnf:
         name: cifs-utils
         state: present
-    - name: Make fstab entry and mount
+      notify: make fstab entry
+  handlers:
+    - name: make fstab entry
       ansible.posix.mount:
         src: "{{ '//' + server + '/' + share_name }}"
         path: "{{ mount_path }}"
