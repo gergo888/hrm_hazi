@@ -1,15 +1,15 @@
 ---
-- name: Install and configure SAMBA shares on the server
+- name: Kiszolgáló oldali beállítások és telepítés
   hosts: "{{ server }}"
   vars_files:
-    - vars/config.yml
+    - config.yml
   tasks:
-    - name: Add system user 
+    - name: Rendszer felhasználó hozzáadása 
       ansible.builtin.user:
         name: "{{ user }}"
         shell: /bin/bash
         append: yes
-    - name: SMB install and config
+    - name: Samba konfiguráció és telepítés
       ansible.builtin.import_role:
         name: vladgh.samba.server
       vars:
@@ -21,12 +21,12 @@
           group: "{{ user }}" 
           write_list: "{{ user }}"
         samba_shares_root: /data
-    - name: fw zone
+    - name: Tűzfal zóna létrehozása
       ansible.posix.firewalld:
         zone: custom
         permanent: true
         state: present
-    - name: Add services to new zone
+    - name: Szolgáltatások engedélyezése
       firewalld:
         service: "{{ item }}"
         state: enabled
@@ -35,30 +35,30 @@
       loop:
         - samba
         - ssh
-    - name: Add port to new zone
+    - name: Port engedélyezése
       firewalld:
         port: 4312/tcp
         state: enabled
         permanent: true
         immediate: yes
 
-- name: mount SAMBA share on the client
+- name: Kilensoldali beállítások és telepítés
   hosts: "{{ client }}"
   vars_files:
-    - vars/config.yml
+    - config.yml
   tasks:
-    - name: Create a directory if it does not exist
+    - name: Könyvtár létrehozása
       ansible.builtin.file:
         path: "{{ mount_path }}"
         state: directory
         mode: '0777'
-    - name: Install cifs-utils
+    - name: cifs-utils telepítése
       ansible.builtin.dnf:
         name: cifs-utils
         state: present
-      notify: make fstab entry
+      notify: Felcsatolás fstab-al
   handlers:
-    - name: make fstab entry
+    - name: Felcsatolás fstab-al
       ansible.posix.mount:
         src: "{{ '//' + server + '/' + share_name }}"
         path: "{{ mount_path }}"
