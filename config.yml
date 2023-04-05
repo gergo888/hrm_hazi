@@ -1,0 +1,7 @@
+server: servera
+client: serverd
+user: fonok
+smb_password: fonok
+share_path: /data
+share_name: fontos
+mount_path: /data
