@@ -1,2 +1,4 @@
 # hrm_hazi
-C3BOW2
+ 
+A playbook.yml elvégzi a kizolgáló és a kliensoldali beállításokat.
+A paraméterek config.yml fájlban adhatók meg.
